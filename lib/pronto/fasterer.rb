@@ -57,7 +57,7 @@ module Pronto
     def config
       @config ||=
         if File.exist?(CONFIG_FILE_NAME)
-          YAML.load_file(CONFIG_FILE_NAME)
+          nil_config_file.merge(YAML.load_file(CONFIG_FILE_NAME))
         else
           nil_config_file
         end
