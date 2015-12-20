@@ -1,14 +1,11 @@
 require 'pronto'
 require 'fasterer'
-require 'yaml'
+require 'fasterer/config'
 
 module Pronto
   class Fasterer < Runner
-    CONFIG_FILE_NAME = '.fasterer.yml'
-    SPEEDUPS_KEY = 'speedups'
-    EXCLUDE_PATHS_KEY = 'exclude_paths'
-
     def initialize
+      @config = ::Fasterer::Config.new
     end
 
     def run(patches, _)
@@ -17,7 +14,7 @@ module Pronto
       valid_patches = patches.select do |patch|
         patch.additions > 0 &&
         ruby_file?(patch.new_file_full_path) &&
-        !ignored_files.include?(patch.delta.new_file[:path])
+        !@config.ignored_files.include?(patch.delta.new_file[:path])
       end
 
       valid_patches.map { |patch| inspect(patch) }.flatten.compact
@@ -31,7 +28,7 @@ module Pronto
       analyzer.errors.each { |error| errors << error }
 
       errors
-        .select { |error| !ignored_speedups.include?(error.name) }
+        .select { |error| !@config.ignored_speedups.include?(error.name) }
         .flat_map do |error|
         patch.added_lines
           .select { |line| line.new_lineno == error.line }
@@ -42,29 +39,6 @@ module Pronto
     def new_message(error, line)
       path = line.patch.delta.new_file[:path]
       Message.new(path, line, :warning, error.explanation)
-    end
-
-    def ignored_speedups
-      @ignored_speedups ||= config[SPEEDUPS_KEY].select do |_, value|
-        value == false
-      end.keys.map(&:to_sym)
-    end
-
-    def ignored_files
-      @ignored_files ||= config[EXCLUDE_PATHS_KEY].flat_map { |path| Dir[path] }
-    end
-
-    def config
-      @config ||=
-        if File.exist?(CONFIG_FILE_NAME)
-          nil_config_file.merge(YAML.load_file(CONFIG_FILE_NAME))
-        else
-          nil_config_file
-        end
-    end
-
-    def nil_config_file
-      { SPEEDUPS_KEY => {}, EXCLUDE_PATHS_KEY => [] }
     end
   end
 end
