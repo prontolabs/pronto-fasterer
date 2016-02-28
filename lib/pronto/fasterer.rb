@@ -13,8 +13,8 @@ module Pronto
 
       valid_patches = patches.select do |patch|
         patch.additions > 0 &&
-        ruby_file?(patch.new_file_full_path) &&
-        !@config.ignored_files.include?(patch.delta.new_file[:path])
+          ruby_file?(patch.new_file_full_path) &&
+          !@config.ignored_files.include?(patch.delta.new_file[:path])
       end
 
       valid_patches.map { |patch| inspect(patch) }.flatten.compact
