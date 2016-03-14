@@ -30,7 +30,7 @@ module Pronto
 
     def new_message(error, line)
       path = line.patch.delta.new_file[:path]
-      Message.new(path, line, :warning, error.explanation)
+      Message.new(path, line, :warning, error.explanation, nil, self.class)
     end
 
     def config
