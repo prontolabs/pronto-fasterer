@@ -4,17 +4,9 @@ require 'fasterer/config'
 
 module Pronto
   class Fasterer < Runner
-    def initialize
-      @config = ::Fasterer::Config.new
-    end
-
-    def run(patches, _)
-      return [] unless patches
-
-      valid_patches = patches.select do |patch|
-        patch.additions > 0 &&
-          ruby_file?(patch.new_file_full_path) &&
-          !@config.ignored_files.include?(patch.delta.new_file[:path])
+    def run
+      valid_patches = ruby_patches.reject do |patch|
+        config.ignored_files.include?(patch.delta.new_file[:path])
       end
 
       valid_patches.map { |patch| inspect(patch) }.flatten.compact
@@ -28,7 +20,7 @@ module Pronto
       analyzer.errors.each { |error| errors << error }
 
       errors
-        .select { |error| !@config.ignored_speedups.include?(error.name) }
+        .select { |error| !config.ignored_speedups.include?(error.name) }
         .flat_map do |error|
         patch.added_lines
           .select { |line| line.new_lineno == error.line }
@@ -39,6 +31,10 @@ module Pronto
     def new_message(error, line)
       path = line.patch.delta.new_file[:path]
       Message.new(path, line, :warning, error.explanation)
+    end
+
+    def config
+      @config ||= ::Fasterer::Config.new
     end
   end
 end

@@ -2,10 +2,10 @@ require 'spec_helper'
 
 module Pronto
   describe Fasterer do
-    let(:fasterer) { Fasterer.new }
+    let(:fasterer) { Fasterer.new(patches) }
 
     describe '#run' do
-      subject { fasterer.run(patches, nil) }
+      subject { fasterer.run }
 
       context 'patches are nil' do
         let(:patches) { nil }
