@@ -13,6 +13,7 @@ module Pronto
     end
 
     def inspect(patch)
+      "MAGIC MAGIC MAGIC"
       analyzer = ::Fasterer::Analyzer.new(patch.new_file_full_path)
       analyzer.scan
 
