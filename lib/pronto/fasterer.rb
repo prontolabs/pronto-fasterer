@@ -34,7 +34,7 @@ module Pronto
     end
 
     def config
-      @config ||= ::Fasterer::Config.new
+      @fasterer_config ||= ::Fasterer::Config.new
     end
   end
 end
