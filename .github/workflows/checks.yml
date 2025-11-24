@@ -15,7 +15,7 @@ jobs:
         fasterer: ['~> 0.10.0', '~> 0.11.0', '< 1.0']
       fail-fast: false
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: use specific fasterer version
       run: echo "gem 'fasterer', '${{ matrix.fasterer }}'" > Gemfile.local
     - uses: ruby/setup-ruby@v1
